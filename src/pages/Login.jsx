@@ -1,4 +1,6 @@
 import { useState } from "react";
+import PageNav from "../components/PageNav";
+import Button from "../components/Button";
 import styles from "../styles/Login.module.css";
 
 export default function Login() {
@@ -8,6 +10,8 @@ export default function Login() {
 
   return (
     <main className={styles.login}>
+      <PageNav />
+
       <form className={styles.form}>
         <div className={styles.row}>
           <label htmlFor="email">Email address</label>
@@ -30,7 +34,7 @@ export default function Login() {
         </div>
 
         <div>
-          <button>Login</button>
+          <Button type="primary">Login</Button>
         </div>
       </form>
     </main>
