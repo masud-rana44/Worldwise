@@ -19,8 +19,8 @@ function CountryList({ cities, isLoading }) {
 
   return (
     <ul className={styles.countryList}>
-      {countries.map((country, idx) => (
-        <CountryItem key={idx} country={country} />
+      {countries.map((country) => (
+        <CountryItem key={country.country} country={country} />
       ))}
     </ul>
   );
