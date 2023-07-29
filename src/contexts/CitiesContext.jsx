@@ -39,6 +39,10 @@ function CitiesProvider({ children }) {
     }
   }
 
+  function addCity(city) {
+    setCities((cities) => [...cities, city]);
+  }
+
   return (
     <CitiesContext.Provider
       value={{
@@ -46,6 +50,7 @@ function CitiesProvider({ children }) {
         isLoading,
         currentCity,
         getCity,
+        addCity,
       }}
     >
       {children}
