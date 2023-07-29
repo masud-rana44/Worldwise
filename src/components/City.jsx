@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useCities } from "../contexts/CitiesContext";
 import BackButton from "./BackButton";
 import Spinner from "./Spinner";
+import Message from "./Message";
 import styles from "../styles/City.module.css";
 
 const formatDate = (date) =>
@@ -27,6 +28,12 @@ function City() {
   const { cityName, emoji, date, notes } = currentCity;
 
   if (isLoading) return <Spinner />;
+
+  console.log(currentCity);
+  if (!currentCity.cityName)
+    return (
+      <Message message="No city data found with this url. please click a valid city." />
+    );
 
   return (
     <div className={styles.city}>

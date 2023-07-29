@@ -35,6 +35,30 @@
         "lng": 13.376933665713324
       },
       "id": 98443197
+    },
+    {
+      "cityName": "Nilphamari",
+      "country": "Bangladesh",
+      "emoji": "🇧🇩",
+      "notes": "Nice city so far\n",
+      "date": "2023-07-29T10:38:58.132Z",
+      "position": {
+        "lat": "25.953105584547533",
+        "lng": "88.88488769531251"
+      },
+      "id": 98443198
+    },
+    {
+      "cityName": "Mahua",
+      "country": "India",
+      "emoji": "🇮🇳",
+      "notes": "",
+      "date": "2023-07-29T10:40:40.535Z",
+      "position": {
+        "lat": "25.799891182088334",
+        "lng": "85.40771484375001"
+      },
+      "id": 98443199
     }
   ]
 }
