@@ -24,7 +24,7 @@ export function convertToEmoji(countryCode) {
 
 function Form() {
   const navigate = useNavigate();
-  const { createCity } = useCities();
+  const { createCity, isLoading } = useCities();
   const [lat, lng] = useUrlPosition();
 
   const [isLoadingGeocoding, setIsLoadingGeocoding] = useState(false);
@@ -35,7 +35,7 @@ function Form() {
   const [emoji, setEmoji] = useState("");
   const [geocodingError, setGeocodingError] = useState("");
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
 
     if (!cityName || !date) return;
@@ -52,7 +52,7 @@ function Form() {
       },
     };
 
-    createCity(newCity);
+    await createCity(newCity);
     navigate("/app/cities");
   }
 
@@ -74,7 +74,7 @@ function Form() {
 
           if (!data.countryCode)
             throw new Error(
-              "That doesn't seems like a city. Click somewhere else🤨"
+              "That doesn't seem to be a city. Click somewhere else 😉"
             );
 
           setCityName(data.city || data.locality || "");
@@ -100,7 +100,10 @@ function Form() {
   if (geocodingError) return <Message message={geocodingError} />;
 
   return (
-    <form className={styles.form} onSubmit={handleSubmit}>
+    <form
+      className={`${styles.form} ${isLoading ? styles.loading : ""}`}
+      onSubmit={handleSubmit}
+    >
       <div className={styles.row}>
         <label htmlFor="cityName">City name</label>
         <input
