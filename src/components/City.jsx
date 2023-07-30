@@ -22,14 +22,13 @@ function City() {
     function () {
       getCity(id);
     },
-    [id]
+    [id, getCity]
   );
 
   const { cityName, emoji, date, notes } = currentCity;
 
   if (isLoading) return <Spinner />;
 
-  console.log(currentCity);
   if (!currentCity.cityName)
     return (
       <Message message="No city data found with this url. please click a valid city." />
