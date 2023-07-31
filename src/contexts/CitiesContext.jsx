@@ -1,4 +1,12 @@
-import { getDatabase, get, orderByKey, query, ref } from "firebase/database";
+import {
+  getDatabase,
+  get,
+  set,
+  remove,
+  orderByKey,
+  query,
+  ref,
+} from "firebase/database";
 import {
   createContext,
   useCallback,
@@ -6,10 +14,9 @@ import {
   useEffect,
   useReducer,
 } from "react";
+import { generateUniqueId } from "../utils";
 
 const CitiesContext = createContext();
-
-const BASE_URL = "http://localhost:8000";
 
 const initialState = {
   cities: [],
@@ -65,7 +72,10 @@ function CitiesProvider({ children }) {
         const snapshot = await get(citiesQuery);
 
         if (snapshot.exists()) {
-          dispatch({ type: "cities/loaded", payload: snapshot.val() });
+          dispatch({
+            type: "cities/loaded",
+            payload: Object.values(snapshot.val()),
+          });
         }
       } catch {
         dispatch({
@@ -83,7 +93,7 @@ function CitiesProvider({ children }) {
       if (Number(id) === currentCity.id) return;
 
       const db = getDatabase();
-      const cityRef = ref(db, `cities/0`);
+      const cityRef = ref(db, "cities/0");
       const cityQuery = query(cityRef, orderByKey());
 
       dispatch({ type: "loading" });
@@ -105,19 +115,16 @@ function CitiesProvider({ children }) {
   );
 
   async function createCity(newCity) {
+    const db = getDatabase();
+    const uniqueId = generateUniqueId();
+    const cityRef = ref(db, "cities/" + uniqueId);
+    const cityQuery = query(cityRef);
+
     dispatch({ type: "loading" });
 
     try {
-      const res = await fetch(`${BASE_URL}/cities`, {
-        method: "POST",
-        body: JSON.stringify(newCity),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await res.json();
-
-      dispatch({ type: "city/created", payload: data });
+      await set(cityQuery, newCity);
+      dispatch({ type: "city/created", payload: { id: uniqueId, ...newCity } });
     } catch {
       dispatch({
         type: "rejected",
@@ -127,18 +134,19 @@ function CitiesProvider({ children }) {
   }
 
   async function deleteCity(id) {
+    const db = getDatabase();
+    const cityRef = ref(db, "cities/" + id);
+    const cityQuery = query(cityRef);
+
     dispatch({ type: "loading" });
 
     try {
-      await fetch(`${BASE_URL}/cities/${id}`, {
-        method: "DELETE",
-      });
-
+      await remove(cityQuery);
       dispatch({ type: "city/deleted", payload: id });
     } catch {
       dispatch({
         type: "rejected",
-        payload: "There was an error deleting city.",
+        payload: "There was an error creating city.",
       });
     }
   }
