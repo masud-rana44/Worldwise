@@ -1,3 +1,4 @@
+import { getDatabase, get, orderByKey, query, ref } from "firebase/database";
 import {
   createContext,
   useCallback,
@@ -55,11 +56,17 @@ function CitiesProvider({ children }) {
     async function fetchCities() {
       dispatch({ type: "loading" });
 
-      try {
-        const res = await fetch(`${BASE_URL}/cities`);
-        const data = await res.json();
+      const db = getDatabase();
+      const citiesRef = ref(db, "cities");
+      const citiesQuery = query(citiesRef, orderByKey());
 
-        dispatch({ type: "cities/loaded", payload: data });
+      try {
+        // request firebase database
+        const snapshot = await get(citiesQuery);
+
+        if (snapshot.exists()) {
+          dispatch({ type: "cities/loaded", payload: snapshot.val() });
+        }
       } catch {
         dispatch({
           type: "rejected",
@@ -75,13 +82,18 @@ function CitiesProvider({ children }) {
     async function getCity(id) {
       if (Number(id) === currentCity.id) return;
 
+      const db = getDatabase();
+      const cityRef = ref(db, `cities/0`);
+      const cityQuery = query(cityRef, orderByKey());
+
       dispatch({ type: "loading" });
 
       try {
-        const res = await fetch(`${BASE_URL}/cities/${id}`);
-        const data = await res.json();
+        const snapshot = await get(cityQuery);
 
-        dispatch({ type: "city/loaded", payload: data });
+        if (snapshot.exists()) {
+          dispatch({ type: "city/loaded", payload: snapshot.val() });
+        }
       } catch {
         dispatch({
           type: "rejected",

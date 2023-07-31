@@ -11,7 +11,6 @@ const AuthContext = createContext();
 
 const initialState = {
   user: {},
-  isAuthenticated: false,
 };
 
 function reducer(state, action) {
@@ -19,23 +18,19 @@ function reducer(state, action) {
     case "user/updated":
       return {
         ...state,
-        isAuthenticated: action.payload,
         user: action.payload,
       };
     case "login":
-      return { ...state, isAuthenticated: true, user: action.payload };
+      return { ...state, user: action.payload };
     case "logout":
-      return { ...state, isAuthenticated: false, user: null };
+      return { ...state, user: null };
     default:
       throw new Error("Unknown action type!");
   }
 }
 
 function AuthProvider({ children }) {
-  const [{ user, isAuthenticated }, dispatch] = useReducer(
-    reducer,
-    initialState
-  );
+  const [{ user }, dispatch] = useReducer(reducer, initialState);
 
   useEffect(function () {
     const auth = getAuth();
@@ -56,7 +51,7 @@ function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
