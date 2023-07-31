@@ -10,6 +10,7 @@ import Message from "./Message";
 import Spinner from "./Spinner";
 import { useNavigate } from "react-router-dom";
 import { useUrlPosition } from "../hooks/useUrlPosition";
+import { generateUniqueId } from "../utils";
 
 import "react-datepicker/dist/react-datepicker.css";
 import styles from "../styles/Form.module.css";
@@ -41,6 +42,7 @@ function Form() {
     if (!cityName || !date) return;
 
     const newCity = {
+      id: generateUniqueId(8),
       cityName,
       country,
       emoji,

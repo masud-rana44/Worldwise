@@ -1,7 +1,12 @@
-import { v4 as uuidv4 } from "uuid";
-
-const generateUniqueId = () => {
-  return uuidv4();
-};
+function generateUniqueId(length) {
+  const chars =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let shortId = "";
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * chars.length);
+    shortId += chars.charAt(randomIndex);
+  }
+  return shortId;
+}
 
 export { generateUniqueId };

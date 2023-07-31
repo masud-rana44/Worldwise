@@ -14,7 +14,6 @@ import {
   useEffect,
   useReducer,
 } from "react";
-import { generateUniqueId } from "../utils";
 
 const CitiesContext = createContext();
 
@@ -90,10 +89,10 @@ function CitiesProvider({ children }) {
 
   const getCity = useCallback(
     async function getCity(id) {
-      if (Number(id) === currentCity.id) return;
+      if (id === `${currentCity.id}`) return;
 
       const db = getDatabase();
-      const cityRef = ref(db, "cities/0");
+      const cityRef = ref(db, "cities/" + id);
       const cityQuery = query(cityRef, orderByKey());
 
       dispatch({ type: "loading" });
@@ -116,15 +115,14 @@ function CitiesProvider({ children }) {
 
   async function createCity(newCity) {
     const db = getDatabase();
-    const uniqueId = generateUniqueId();
-    const cityRef = ref(db, "cities/" + uniqueId);
+    const cityRef = ref(db, "cities/" + newCity.id);
     const cityQuery = query(cityRef);
 
     dispatch({ type: "loading" });
 
     try {
       await set(cityQuery, newCity);
-      dispatch({ type: "city/created", payload: { id: uniqueId, ...newCity } });
+      dispatch({ type: "city/created", payload: newCity });
     } catch {
       dispatch({
         type: "rejected",
