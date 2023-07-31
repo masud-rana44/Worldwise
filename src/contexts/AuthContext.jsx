@@ -1,4 +1,11 @@
-import { createContext, useContext, useReducer } from "react";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+} from "firebase/auth";
+import { createContext, useContext, useEffect, useReducer } from "react";
+import "../firebase.js";
 
 const AuthContext = createContext();
 
@@ -9,6 +16,12 @@ const initialState = {
 
 function reducer(state, action) {
   switch (action.type) {
+    case "user/updated":
+      return {
+        ...state,
+        isAuthenticated: action.payload,
+        user: action.payload,
+      };
     case "login":
       return { ...state, isAuthenticated: true, user: action.payload };
     case "logout":
@@ -18,26 +31,28 @@ function reducer(state, action) {
   }
 }
 
-const FAKE_USER = {
-  name: "Jack",
-  email: "jack@example.com",
-  password: "bangladesh",
-  avatar: "https://i.pravatar.cc/100?u=zz",
-};
-
 function AuthProvider({ children }) {
   const [{ user, isAuthenticated }, dispatch] = useReducer(
     reducer,
     initialState
   );
 
+  useEffect(function () {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      dispatch({ type: "user/updated", payload: user });
+    });
+    return unsubscribe;
+  }, []);
+
   function login(email, password) {
-    if (email === FAKE_USER.email && password === FAKE_USER.password)
-      dispatch({ type: "login", payload: FAKE_USER });
+    const auth = getAuth();
+    return signInWithEmailAndPassword(auth, email, password);
   }
 
   function logout() {
-    dispatch({ type: "logout" });
+    const auth = getAuth();
+    return signOut(auth);
   }
 
   return (

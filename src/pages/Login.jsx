@@ -3,30 +3,43 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import PageNav from "../components/PageNav";
 import Button from "../components/Button";
-// import Spinner from "../components/Spinner";
+import SpinnerFullPage from "../components/SpinnerFullPage";
 import styles from "../styles/Login.module.css";
 
 export default function Login() {
   const navigate = useNavigate();
-  const { login, isAuthenticated } = useAuth();
+  const { login, user } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
+    if (!email || !password) return;
 
-    if (email && password) login(email, password);
+    setIsLoading(true);
+    setError("");
+
+    try {
+      await login(email, password);
+    } catch (err) {
+      console.error(err);
+      setError(err.message || err);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   useEffect(
     function () {
-      if (isAuthenticated) navigate("/app", { replace: true });
+      if (user) navigate("/app", { replace: true });
     },
-    [isAuthenticated, navigate]
+    [user, navigate]
   );
 
-  // if (isAuthenticated) return <Spinner />;
+  if (user || isLoading) return <SpinnerFullPage />;
 
   return (
     <main className={styles.login}>
