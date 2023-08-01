@@ -11,10 +11,14 @@ function User() {
     navigate("/");
   }
 
+  if (!user || !user.displayName) return null;
+
+  const firstName = user.displayName.trim().split(" ")[0];
+
   return (
     <div className={styles.user}>
       {/* <img src={user.avatar} alt={user.name} /> */}
-      <span>Welcome, {user?.name}</span>
+      <span>Welcome, {firstName}</span>
       <button onClick={handleClick}>Logout</button>
     </div>
   );

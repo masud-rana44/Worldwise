@@ -24,6 +24,7 @@ const Login = lazy(() => import("./pages/Login"));
 const PageNotFound = lazy(() => import("./pages/PageNotFound"));
 
 import "./index.css";
+import Signup from "./pages/Signup";
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
               <Route path="pricing" element={<Pricing />} />
               <Route path="product" element={<Product />} />
               <Route path="login" element={<Login />} />
+              <Route path="signup" element={<Signup />} />
               <Route
                 path="app"
                 element={

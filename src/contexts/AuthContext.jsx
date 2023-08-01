@@ -1,8 +1,10 @@
 import {
+  createUserWithEmailAndPassword,
   getAuth,
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
+  updateProfile,
 } from "firebase/auth";
 import { createContext, useContext, useEffect, useReducer } from "react";
 import "../firebase.js";
@@ -20,10 +22,6 @@ function reducer(state, action) {
         ...state,
         user: action.payload,
       };
-    case "login":
-      return { ...state, user: action.payload };
-    case "logout":
-      return { ...state, user: null };
     default:
       throw new Error("Unknown action type!");
   }
@@ -40,6 +38,15 @@ function AuthProvider({ children }) {
     return unsubscribe;
   }, []);
 
+  async function signup(email, password, username) {
+    const auth = getAuth();
+    await createUserWithEmailAndPassword(auth, email, password);
+
+    await updateProfile(auth.currentUser, { displayName: username });
+    const user = auth.currentUser;
+    dispatch({ type: "user/updated", payload: user });
+  }
+
   function login(email, password) {
     const auth = getAuth();
     return signInWithEmailAndPassword(auth, email, password);
@@ -51,7 +58,7 @@ function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, signup, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
