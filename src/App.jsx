@@ -25,6 +25,7 @@ const PageNotFound = lazy(() => import("./pages/PageNotFound"));
 
 import "./index.css";
 import Signup from "./pages/Signup";
+import PublicOutlet from "./components/PublicOutlet";
 
 function App() {
   return (
@@ -36,8 +37,10 @@ function App() {
               <Route index element={<Homepage />} />
               <Route path="pricing" element={<Pricing />} />
               <Route path="product" element={<Product />} />
-              <Route path="login" element={<Login />} />
-              <Route path="signup" element={<Signup />} />
+              <Route path="/*" element={<PublicOutlet />}>
+                <Route path="login" element={<Login />} />
+                <Route path="signup" element={<Signup />} />
+              </Route>
               <Route
                 path="app"
                 element={

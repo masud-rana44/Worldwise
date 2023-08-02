@@ -1,50 +1,42 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import PageNav from "../components/PageNav";
 import Button from "../components/Button";
-import SpinnerFullPage from "../components/SpinnerFullPage";
 import styles from "../styles/Login.module.css";
+import StatusMessage from "../components/StatusMessage ";
 
 export default function Signup() {
-  const navigate = useNavigate();
-  const { signup, user } = useAuth();
+  const { signup } = useAuth();
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
     if (!username || !email || !password) return;
 
-    setIsLoading(true);
-    setError("");
-
     try {
+      setIsLoading(true);
+      setError("");
+
       await signup(email, password, username);
     } catch (err) {
-      console.error(err);
-      setError(err.message || err);
+      console.log(err);
+      setError(err);
     } finally {
       setIsLoading(false);
     }
   }
 
-  useEffect(
-    function () {
-      if (user) navigate("/app", { replace: true });
-    },
-    [user, navigate]
-  );
-
-  if (user || isLoading) return <SpinnerFullPage />;
-
   return (
     <main className={styles.login}>
       <PageNav />
+
+      {error && <StatusMessage status="error" message={error} />}
 
       <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.row}>
@@ -54,6 +46,7 @@ export default function Signup() {
             id="username"
             onChange={(e) => setUsername(e.target.value)}
             value={username}
+            required
           />
         </div>
 
@@ -64,6 +57,7 @@ export default function Signup() {
             id="email"
             onChange={(e) => setEmail(e.target.value)}
             value={email}
+            required
           />
         </div>
 
@@ -74,11 +68,14 @@ export default function Signup() {
             id="password"
             onChange={(e) => setPassword(e.target.value)}
             value={password}
+            required
           />
         </div>
 
         <div>
-          <Button type="primary">Signup</Button>
+          <Button type="primary" disabled={isLoading}>
+            {isLoading ? "Loading..." : "Signup"}
+          </Button>
         </div>
       </form>
     </main>

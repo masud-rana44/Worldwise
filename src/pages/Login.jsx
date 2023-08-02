@@ -1,49 +1,28 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import PageNav from "../components/PageNav";
 import Button from "../components/Button";
-import SpinnerFullPage from "../components/SpinnerFullPage";
 import styles from "../styles/Login.module.css";
+import StatusMessage from "../components/StatusMessage ";
 
 export default function Login() {
-  const navigate = useNavigate();
-  const { login, user } = useAuth();
+  const { login, userLoading, userError } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
 
-  async function handleSubmit(e) {
+  function handleSubmit(e) {
     e.preventDefault();
     if (!email || !password) return;
 
-    setIsLoading(true);
-    setError("");
-
-    try {
-      await login(email, password);
-    } catch (err) {
-      console.error(err);
-      setError(err.message || err);
-    } finally {
-      setIsLoading(false);
-    }
+    login(email, password);
   }
-
-  useEffect(
-    function () {
-      if (user) navigate("/app", { replace: true });
-    },
-    [user, navigate]
-  );
-
-  if (user || isLoading) return <SpinnerFullPage />;
 
   return (
     <main className={styles.login}>
       <PageNav />
+
+      {userError && <StatusMessage status="error" message={userError} />}
 
       <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.row}>
@@ -53,6 +32,7 @@ export default function Login() {
             id="email"
             onChange={(e) => setEmail(e.target.value)}
             value={email}
+            required
           />
         </div>
 
@@ -63,11 +43,12 @@ export default function Login() {
             id="password"
             onChange={(e) => setPassword(e.target.value)}
             value={password}
+            required
           />
         </div>
 
         <div>
-          <Button type="primary">Login</Button>
+          <Button type="primary">{userLoading ? "Loading..." : "Login"}</Button>
         </div>
       </form>
     </main>

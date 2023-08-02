@@ -8,27 +8,48 @@ import {
 } from "firebase/auth";
 import { createContext, useContext, useEffect, useReducer } from "react";
 import "../firebase.js";
+import SpinnerFullPage from "../components/SpinnerFullPage.jsx";
 
 const AuthContext = createContext();
 
 const initialState = {
-  user: {},
+  user: null,
+  isLoading: true,
+  error: "",
 };
 
 function reducer(state, action) {
   switch (action.type) {
+    case "user/loading":
+      return {
+        ...state,
+        isLoading: true,
+        error: "",
+      };
     case "user/updated":
       return {
         ...state,
         user: action.payload,
+        isLoading: false,
       };
+    case "user/rejected":
+      return {
+        ...state,
+        error: action.payload,
+        isLoading: false,
+      };
+    case "user/errorUpdated":
+      return { ...state, error: "" };
     default:
       throw new Error("Unknown action type!");
   }
 }
 
 function AuthProvider({ children }) {
-  const [{ user }, dispatch] = useReducer(reducer, initialState);
+  const [{ user, isLoading, error }, dispatch] = useReducer(
+    reducer,
+    initialState
+  );
 
   useEffect(function () {
     const auth = getAuth();
@@ -38,28 +59,61 @@ function AuthProvider({ children }) {
     return unsubscribe;
   }, []);
 
+  // Signup
   async function signup(email, password, username) {
     const auth = getAuth();
-    await createUserWithEmailAndPassword(auth, email, password);
+    dispatch({ type: "user/loading" });
 
-    await updateProfile(auth.currentUser, { displayName: username });
-    const user = auth.currentUser;
-    dispatch({ type: "user/updated", payload: user });
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+
+      await updateProfile(auth.currentUser, { displayName: username });
+      const user = auth.currentUser;
+      dispatch({ type: "user/updated", payload: user });
+    } catch (err) {
+      console.error(err);
+      dispatch({ type: "user/rejected", payload: err.message });
+    }
   }
 
-  function login(email, password) {
+  // Login
+  async function login(email, password) {
     const auth = getAuth();
-    return signInWithEmailAndPassword(auth, email, password);
+    dispatch({ type: "user/loading" });
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (err) {
+      console.error(err);
+      dispatch({ type: "user/rejected", payload: err.message });
+    }
   }
 
-  function logout() {
+  // Logout
+  async function logout() {
     const auth = getAuth();
-    return signOut(auth);
+    dispatch({ type: "user/loading" });
+    try {
+      return signOut(auth);
+    } catch (err) {
+      console.error(err);
+      dispatch({ type: "user/rejected", payload: err.message });
+    }
   }
 
   return (
-    <AuthContext.Provider value={{ user, signup, login, logout }}>
-      {children}
+    <AuthContext.Provider
+      value={{
+        user,
+        userLoading: isLoading,
+        userError: error,
+        signup,
+        login,
+        logout,
+        dispatch,
+      }}
+    >
+      {isLoading ? <SpinnerFullPage /> : children}
     </AuthContext.Provider>
   );
 }
