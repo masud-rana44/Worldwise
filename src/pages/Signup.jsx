@@ -4,6 +4,7 @@ import PageNav from "../components/PageNav";
 import Button from "../components/Button";
 import styles from "../styles/Login.module.css";
 import StatusMessage from "../components/StatusMessage ";
+import { Link } from "react-router-dom";
 
 export default function Signup() {
   const { signup } = useAuth();
@@ -12,8 +13,8 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -25,8 +26,7 @@ export default function Signup() {
 
       await signup(email, password, username);
     } catch (err) {
-      console.log(err);
-      setError(err);
+      setError(err.message);
     } finally {
       setIsLoading(false);
     }
@@ -38,7 +38,10 @@ export default function Signup() {
 
       {error && <StatusMessage status="error" message={error} />}
 
-      <form className={styles.form} onSubmit={handleSubmit}>
+      <form
+        className={`${styles.form} ${isLoading ? styles.loading : ""}`}
+        onSubmit={handleSubmit}
+      >
         <div className={styles.row}>
           <label htmlFor="username">Username</label>
           <input
@@ -71,6 +74,10 @@ export default function Signup() {
             required
           />
         </div>
+
+        <p>
+          Already have an account? <Link to="/login">login</Link>
+        </p>
 
         <div>
           <Button type="primary" disabled={isLoading}>

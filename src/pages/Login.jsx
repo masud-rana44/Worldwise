@@ -4,27 +4,43 @@ import PageNav from "../components/PageNav";
 import Button from "../components/Button";
 import styles from "../styles/Login.module.css";
 import StatusMessage from "../components/StatusMessage ";
+import { Link } from "react-router-dom";
 
 export default function Login() {
-  const { login, userLoading, userError } = useAuth();
+  const { login } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  function handleSubmit(e) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleSubmit(e) {
     e.preventDefault();
     if (!email || !password) return;
 
-    login(email, password);
+    try {
+      setIsLoading(true);
+      setError("");
+
+      await login(email, password);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
     <main className={styles.login}>
       <PageNav />
 
-      {userError && <StatusMessage status="error" message={userError} />}
+      {error && <StatusMessage status="error" message={error} />}
 
-      <form className={styles.form} onSubmit={handleSubmit}>
+      <form
+        className={`${styles.form} ${isLoading ? styles.loading : ""}`}
+        onSubmit={handleSubmit}
+      >
         <div className={styles.row}>
           <label htmlFor="email">Email address</label>
           <input
@@ -47,8 +63,14 @@ export default function Login() {
           />
         </div>
 
+        <p>
+          Not an account? <Link to="/signup">signup</Link>
+        </p>
+
         <div>
-          <Button type="primary">{userLoading ? "Loading..." : "Login"}</Button>
+          <Button type="primary" disabled={isLoading}>
+            {isLoading ? "Loading..." : "Login"}
+          </Button>
         </div>
       </form>
     </main>

@@ -19,8 +19,29 @@
   margin: 7rem auto;
 }
 
+.form.loading {
+  opacity: 0.8;
+}
+
 .row {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+.form p {
+  display: flex;
+  gap: 0.6rem;
+  font-size: 1.4rem;
+  font-weight: 500;
+  margin-top: -0.6rem;
+}
+
+.form p a {
+  text-decoration: none;
+  color: var(--color-brand--2);
+}
+
+.form p a:hover {
+  text-decoration: underline;
 }

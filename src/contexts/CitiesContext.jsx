@@ -109,7 +109,7 @@ function CitiesProvider({ children }) {
     const requestTimeout = setTimeout(() => {
       isCancelled = true;
       dispatch({ type: "rejected", payload: "Request timed out" });
-    }, 10000); // 10 seconds
+    }, 20000); // 20 seconds
 
     // Clean up the timeout on component unmount or when user.uid changes
     return () => clearTimeout(requestTimeout);
